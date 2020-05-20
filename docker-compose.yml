@@ -1,0 +1,22 @@
+version: '3'
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - '80:80'
+    volumes:
+      - './public:/usr/share/nginx/html:ro'
+  web:
+    build: .
+    depends_on:
+      - db
+    ports:
+      - '8000:8000'
+    entrypoint: './wait-for-it.sh db:3306 -t 0 --strict -- npm run run:prd'
+  db:
+    image: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: todo
